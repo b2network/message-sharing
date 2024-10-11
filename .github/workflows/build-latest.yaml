@@ -1,0 +1,30 @@
+name: Docker build latest image
+on:
+  push:
+    branches: [dev]
+  #  paths: ['src/**']
+
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build and publish a Docker image for ${{ github.repository }}
+        uses: macbre/push-to-ghcr@master
+        with:
+          image_name: ${{ github.repository }}  # it will be lowercased internally
+          github_token: ${{ secrets.PERSONAL_TOKEN }}
+          dockerfile: ./applications/Dockerfile
+      - name: clone repo
+        run: git clone https://${{secrets.PERSONAL_USERNAME}}:${{secrets.PERSONAL_TOKEN}}@github.com/b2network/devops.git 
+      - name: modify 
+        run: cd devops/devops_dev/message-channel/ && sed -i "s/gitTag:.*/gitTag:\ '${{github.sha}}'/g" ${{vars.DEVOPS_PROJECT}}-builder/dev-values*.yaml ${{vars.DEVOPS_PROJECT}}-listener/dev-values*.yaml ${{vars.DEVOPS_PROJECT}}-proposer/dev-values*.yaml  ${{vars.DEVOPS_PROJECT}}-validator/dev-values*.yaml
+      - name: commit && push
+        run: |
+          cd devops
+          git config --global  user.name ${{secrets.PERSONAL_USERNAME}}
+          git config --global user.email "frankbian90@gmail.com"
+          git add .
+          git commit -m "update gitTag to ${{github.sha}}"
+          git push origin main

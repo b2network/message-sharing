@@ -1,0 +1,57 @@
+log:
+  level: 6
+
+particle:
+  Url: https://rpc.particle.network/evm-chain
+  ChainId: 1123
+  ProjectUuid: 0000000000000000000000000000000000000000
+  ProjectKey: 0000000000000000000000000000000000000000
+  AAPubKeyAPI: https://bridge-aa-dev.bsquared.network
+
+database:
+  username: root
+  password: 123456
+  host: 127.0.0.1
+  port: 3306
+  dbname: b2_message
+  loglevel: 4  # 1: Silent 2: Error 3: Warn 4: Info
+
+bitcoin:
+  status: false
+  name: bitcoin
+  chaintype: 2
+  chainid: 0
+  mainnet: false
+  rpcurl: 127.0.0.1:8085
+  safeblocknumber: 3
+  ListenAddress: muGFcyjuyURJJsXaLXHCm43jLBmGPPU7ME
+  BlockInterval: 6000
+  ToChainId: 1123
+  ToContractAddress: 0x0000000000000000000000000000000000000000
+  BtcUser: test
+  BtcPass: test
+  DisableTLS: false
+
+bsquared:
+  status: false
+  name: bsquared
+  chaintype: 1
+  mainnet: false
+  chainid: 1123
+  rpcurl: 127.0.0.1:8084
+  safeblocknumber: 1
+  ListenAddress: 0x0000000000000000000000000000000000000000
+  BlockInterval: 2000
+  Builders: [ "0x0000000000000000000000000000000000000000000000000000000000000000" ]
+
+arbitrum:
+  status: false
+  name: arbitrum
+  chaintype: 1
+  chainid: 421614
+  mainnet: false
+  rpcurl: 127.0.0.1:8083
+  safeblocknumber: 1
+  ListenAddress: 0x0000000000000000000000000000000000000000
+  BlockInterval: 100
+  Builders: [ "0x0000000000000000000000000000000000000000000000000000000000000000" ]

@@ -1,0 +1,56 @@
+log:
+  level: 6
+
+bsquared:
+  status: false
+  name: bsquared
+  chaintype: 1
+  mainnet: false
+  chainid: 1123
+  rpcurl: 127.0.0.1:8081
+  safeblocknumber: 1
+  ListenAddress: 0x0000000000000000000000000000000000000000
+  BlockInterval: 2000
+  NodeKey: 0000000000000000000000000000000000000000000000000000000000000000
+  Endpoint: /ip4/127.0.0.1/tcp/20000/p2p/16Uiu2HAkwynt59WSsNRS9sk1aszgeQ1PXUS8ax3a3tsewaVMgvZX # /ip4/{host}/tcp/{port}/p2p/{peerId}
+  SignatureWeight: 1
+
+arbitrum:
+  status: false
+  name: arbitrum
+  chaintype: 1
+  chainid: 421614
+  mainnet: false
+  rpcurl: 127.0.0.1:8082
+  safeblocknumber: 1
+  ListenAddress: 0x0000000000000000000000000000000000000000
+  BlockInterval: 100
+  NodeKey: 0000000000000000000000000000000000000000000000000000000000000000
+  Endpoint: /ip4/127.0.0.1/tcp/20001/p2p/16Uiu2HAkwynt59WSsNRS9sk1aszgeQ1PXUS8ax3a3tsewaVMgvZX # /ip4/{host}/tcp/{port}/p2p/{peerId}
+  SignatureWeight: 1
+
+bitcoin:
+  status: false
+  name: bitcoin
+  chaintype: 2
+  chainid: 0
+  mainnet: false
+  rpcurl: 127.0.0.1:8083
+  safeblocknumber: 3
+  ListenAddress: muGFcyjuyURJJsXaLXHCm43jLBmGPPU7ME
+  BlockInterval: 6000
+  ToChainId: 1123
+  ToContractAddress: 0x0000000000000000000000000000000000000000
+  BtcUser: 000000000000000000
+  BtcPass: 000000000000000000
+  DisableTLS: true
+  NodeKey: 0000000000000000000000000000000000000000000000000000000000000000
+  Endpoint: /ip4/127.0.0.1/tcp/20001/p2p/16Uiu2HAkwynt59WSsNRS9sk1aszgeQ1PXUS8ax3a3tsewaVMgvZX # /ip4/{host}/tcp/{port}/p2p/{peerId}
+  SignatureWeight: 1
+
+particle:
+  Url: https://rpc.particle.network/evm-chain
+  ChainId: 1123
+  ProjectUuid: 000000000000000000
+  ProjectKey: 000000000000000000
+  AAPubKeyAPI: https://bridge-aa-dev.bsquared.network
