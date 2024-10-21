@@ -11,7 +11,7 @@ interface IMessageSharing {
 }
 
 interface IBusinessContract {
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success, string memory error);
 }
 
 enum OrderStatus {
@@ -51,7 +51,7 @@ contract Orderbook is IBusinessContract, Initializable, UUPSUpgradeable, EIP712U
 
     event Settle(string order_no, uint256 fee_amount, uint256 end_time, uint256 from_id);
 
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success) {
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success, string memory error) {
         require(bridges[from_chain_id] == from_sender, "Invalid chain id or from_sender");
         require(!executes[from_chain_id][from_id], "Have been executed");
         executes[from_chain_id][from_id] = true;
@@ -69,7 +69,7 @@ contract Orderbook is IBusinessContract, Initializable, UUPSUpgradeable, EIP712U
         order.fee_amount = 0;
         order.status = OrderStatus.IN_PROCESS;
         emit PayOrder(from_chain_id, from_id, from_sender, order_no, start_time, user_address, token_address, deposit_amount);
-        return true;
+        return (true, "");
     }
 
     function settle(string calldata order_no, uint256 fee_amount) external {

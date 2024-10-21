@@ -235,6 +235,7 @@ func (l *EthereumListener) handEvent() {
 		handles := make(map[string]bool)
 
 		var Type enums.MessageType
+		var FromMessageBridge string
 		var FromChainId int64
 		var FromSender string
 		var FromId string
@@ -259,6 +260,7 @@ func (l *EthereumListener) handEvent() {
 					time.Sleep(duration)
 					continue
 				}
+				FromMessageBridge = event.ContractAddress
 				FromChainId = messageCall.FromChainId
 				FromSender = messageCall.FromSender
 				FromId = common.BytesToHash(messageCall.FromId.BigInt().Bytes()).Hex()
@@ -279,17 +281,30 @@ func (l *EthereumListener) handEvent() {
 				FromId = common.BytesToHash(messageSend.FromId.BigInt().Bytes()).Hex()
 				ToChainId = messageSend.ToChainId
 				ToContractAddress = messageSend.ContractAddress
+				ToMessageBridge = event.ContractAddress
 				ToBytes = messageSend.Bytes
 				Type = enums.MessageTypeSend
 				status = enums.MessageStatusPending
 			}
 
-			messageBridge, ok := l.bridges[ToChainId]
-			if ok {
-				ToMessageBridge = messageBridge
-			} else {
-				invalids = append(invalids, event.Id)
-				continue
+			if FromMessageBridge == "" {
+				messageBridge, ok := l.bridges[FromChainId]
+				if ok {
+					FromMessageBridge = messageBridge
+				} else {
+					invalids = append(invalids, event.Id)
+					continue
+				}
+			}
+
+			if ToMessageBridge == "" {
+				messageBridge, ok := l.bridges[ToChainId]
+				if ok {
+					ToMessageBridge = messageBridge
+				} else {
+					invalids = append(invalids, event.Id)
+					continue
+				}
 			}
 
 			var message models.Message
@@ -305,7 +320,7 @@ func (l *EthereumListener) handEvent() {
 					Type:              Type,
 					FromChainId:       FromChainId,
 					FromSender:        FromSender,
-					FromMessageBridge: event.ContractAddress,
+					FromMessageBridge: FromMessageBridge,
 					FromId:            FromId,
 					ToChainId:         ToChainId,
 					ToMessageBridge:   ToMessageBridge,

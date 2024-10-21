@@ -13,7 +13,7 @@ interface IMessageSharing {
 }
 
 interface IBusinessContract {
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success, string memory error);
 }
 enum OrderStatus {
     UNKNOWN,
@@ -101,7 +101,7 @@ contract Cashier is IBusinessContract, Initializable, UUPSUpgradeable, AccessCon
     }
 
 
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external onlyRole(SENDER_ROLE) returns (bool success) {
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external onlyRole(SENDER_ROLE) returns (bool success, string memory error) {
         require(!executes[from_chain_id][from_id], "Have been executed");
         executes[from_chain_id][from_id] = true;
         (string memory order_no, address token_address, address user_address, uint256 fee_amount, uint256 end_time) = decodeSettleData(data);
@@ -130,7 +130,7 @@ contract Cashier is IBusinessContract, Initializable, UUPSUpgradeable, AccessCon
         withdraw_balance = withdraw_balance + fee_amount;
 
         emit SettleOrder(order_no, token_address, user_address, fee_amount, end_time);
-        return true;
+        return (true, "");
     }
 
     // ************************************** ADMIN FUNCTION **************************************

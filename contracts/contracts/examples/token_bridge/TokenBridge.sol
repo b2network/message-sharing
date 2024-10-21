@@ -12,7 +12,7 @@ interface IMessageSharing {
 }
 
 interface IBusinessContract {
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success, string memory error);
 }
 
 contract TokenBridge is IBusinessContract, Initializable, UUPSUpgradeable, EIP712Upgradeable, AccessControlUpgradeable {
@@ -36,7 +36,7 @@ contract TokenBridge is IBusinessContract, Initializable, UUPSUpgradeable, EIP71
 
     event Unlock(uint256 from_chain_id, uint256 from_id, address from_address, address to_token_address, uint256 to_chain_id, address to_token_bridge, address to_address, uint256 amount);
 
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success) {
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success, string memory error) {
         require(bridges[from_chain_id] == from_sender, "Invalid chain id or from_sender");
         require(!executes[from_chain_id][from_id], "Have been executed");
         executes[from_chain_id][from_id] = true;
@@ -48,7 +48,7 @@ contract TokenBridge is IBusinessContract, Initializable, UUPSUpgradeable, EIP71
         }
         _safeTransfer(token_address, to_address, amount);
         emit Unlock(from_chain_id, from_id, from_address, token_address, block.chainid, address(this), to_address, amount);
-        return true;
+        return (true, "");
     }
 
     function lock(address token_address, uint256 amount, uint256 to_chain_id, address to_token_bridge, address to_address) external payable {

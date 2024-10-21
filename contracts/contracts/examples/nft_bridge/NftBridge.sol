@@ -11,7 +11,7 @@ interface IMessageSharing {
 }
 
 interface IBusinessContract {
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata data) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external returns (bool success, string memory error);
 }
 
 enum NftStandard {
@@ -58,12 +58,17 @@ contract NftBridge is IBusinessContract, Initializable, UUPSUpgradeable, EIP712U
 
     event Unlock(uint256 from_chain_id, uint256 from_id, address from_address, address from_token_address, address to_token_address, uint256 token_id, uint256 to_chain_id, address to_token_bridge, address to_address, uint256 amount);
 
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success) {
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external onlyRole(SENDER_ROLE) override returns (bool success, string memory error) {
         require(bridges[from_chain_id] == from_sender, "Invalid chain id or from_sender");
         require(!executes[from_chain_id][from_id], "Have been executed");
         executes[from_chain_id][from_id] = true;
         (address from_token_address, address to_token_address, uint256 token_id, address from_address, address to_address, uint256 amount) = decodeLockData(message);
+        transferNft(from_chain_id, from_token_address, to_token_address, token_id, to_address, amount);
+        emit Unlock(from_chain_id, from_id, from_address, from_token_address, to_token_address, token_id , block.chainid, address(this), to_address, amount);
+        return (true, "");
+    }
 
+    function transferNft(uint256 from_chain_id, address from_token_address, address to_token_address, uint256 token_id, address to_address, uint256 amount) internal {
         Nft memory nft = nft_mapping[from_chain_id][from_token_address][block.chainid];
         require(nft.standard != NftStandard.UNKNOWN, "Invalid nft info");
         require(nft.nft_address == to_token_address, "Invalid nft address");
@@ -73,9 +78,6 @@ contract NftBridge is IBusinessContract, Initializable, UUPSUpgradeable, EIP712U
         } else if (nft.standard == NftStandard.ERC1155) {
             interTransferNft1155(nft.nft_address, to_address, token_id, amount);
         }
-
-        emit Unlock(from_chain_id, from_id, from_address, from_token_address, nft.nft_address, token_id , block.chainid, address(this), to_address, amount);
-        return true;
     }
 
     function lock(address nft_address, uint256 token_id, uint256 amount, uint256 to_chain_id, address to_token_bridge, address to_address) external {

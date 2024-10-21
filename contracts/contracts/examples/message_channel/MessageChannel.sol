@@ -11,7 +11,8 @@ interface IMessageSharing {
 }
 
 interface IBusinessContract {
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata to_message) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external returns (bool success, string memory error);
+    // function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata to_message) external returns (bool success);
 }
 
 contract MessageChannel is IBusinessContract, Initializable, UUPSUpgradeable, EIP712Upgradeable, AccessControlUpgradeable {
@@ -55,12 +56,12 @@ contract MessageChannel is IBusinessContract, Initializable, UUPSUpgradeable, EI
         return from_id;
     }
 
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata to_message) external onlyRole(SENDER_ROLE) override returns (bool success) {
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata to_message) external onlyRole(SENDER_ROLE) override returns (bool success, string memory error) {
         // TODO 1. Verify the validity of from_chain_id and from_sender
         // TODO 2. Verify that from_id has been executed
         // TODO 3. Parse data and execute service logic
         emit Send(from_chain_id, from_id, from_sender, to_message);
-        return true;
+        return (true, "");
     }
 
 }

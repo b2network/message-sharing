@@ -91,8 +91,9 @@ interface IBusinessContract {
      * @param from_sender The address of the sender on the originating chain, used to verify the sender's legitimacy (business needs may dictate whether verification is necessary).
      * @param message The input data for processing the cross-chain message, which may need to be decoded based on byte encoding rules.
      * @return success Indicates whether the message processing was successful, returning true for success and false for failure.
+     * @return error Returns an error message if processing fails. A descriptive string containing the reason for failure, useful for debugging and logging.
      */
-    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external returns (bool success);
+    function send(uint256 from_chain_id, uint256 from_id, address from_sender, bytes calldata message) external returns (bool success, string memory error);
 }
 
 contract MessageSharing is IMessageSharing, Initializable, UUPSUpgradeable, EIP712Upgradeable, AccessControlUpgradeable {
@@ -145,8 +146,8 @@ contract MessageSharing is IMessageSharing, Initializable, UUPSUpgradeable, EIP7
         require(weight_ >= weights[from_chain_id], "verify signatures weight invalid");
 
         if (to_business_contract != address(0x0)) {
-            bool success = IBusinessContract(to_business_contract).send(from_chain_id, from_id, from_sender, to_message);
-            require(success, "Call failed");
+            (bool success, string memory error) = IBusinessContract(to_business_contract).send(from_chain_id, from_id, from_sender, to_message);
+            require(success, error);
         }
         emit Send(from_chain_id, from_id, from_sender, block.chainid, to_business_contract, to_message);
     }
